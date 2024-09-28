@@ -24,11 +24,13 @@ class ImageProcessor:
         # Configura la ruta al ejecutable de Tesseract
         pytesseract.pytesseract.tesseract_cmd = ruta_tesseract
 
-    def procesar_imagen(self, ruta_archivo):
+    def procesar_imagen(self, ruta_archivo, ruta_carpeta_base):
         try:
-            # Obtiene el nombre del archivo sin extensión
-            nombre_archivo = os.path.basename(ruta_archivo)
-            nombre_sin_extension = os.path.splitext(nombre_archivo)[0]
+            # Obtiene la ruta relativa del archivo respecto a la carpeta base
+            ruta_relativa = os.path.relpath(ruta_archivo, ruta_carpeta_base)
+            # Reemplaza los separadores de directorio por guiones bajos para evitar problemas
+            nombre_relativo = ruta_relativa.replace(os.sep, '_')
+            nombre_sin_extension = os.path.splitext(nombre_relativo)[0]
 
             # Abre la imagen
             image = Image.open(ruta_archivo)
@@ -48,7 +50,7 @@ class ImageProcessor:
             # Expresiones regulares ajustadas
             lat_pattern = r'Lat[:\s]*([-+]?\d+[\.,]?\d*)[°]?'
             lon_pattern = r'Long[:\s]*([-+]?\d+[\.,]?\d*)[°]?'
-            fecha_hora_pattern = r'(\d{1,2}/\d{1,2}/\d{2,4}\s+\d{1,2}:\d{2}\s+[ap]\. m\.)'
+            fecha_hora_pattern = r'(\d{1,2}/\d{1,2}/(\d{2}|\d{4})\s+\d{1,2}:\d{2}\s+[ap]\.? m\.?)'
 
             lat_match = re.search(lat_pattern, texto, re.IGNORECASE)
             lon_match = re.search(lon_pattern, texto, re.IGNORECASE)
@@ -57,12 +59,12 @@ class ImageProcessor:
             if lat_match:
                 lat = lat_match.group(1)
             else:
-                print(f"No se encontró la latitud en el texto de {nombre_archivo}.")
+                print(f"No se encontró la latitud en el texto de {nombre_relativo}.")
 
             if lon_match:
                 lon = lon_match.group(1)
             else:
-                print(f"No se encontró la longitud en el texto de {nombre_archivo}.")
+                print(f"No se encontró la longitud en el texto de {nombre_relativo}.")
 
             if fecha_hora_match:
                 fecha_hora = fecha_hora_match.group(1)
@@ -87,11 +89,11 @@ class ImageProcessor:
                         fecha = f"{dia}/{mes}/{anio}"
 
                 except ValueError:
-                    print(f"Error al separar la fecha y hora en {nombre_archivo}")
+                    print(f"Error al separar la fecha y hora en {nombre_relativo}")
                     fecha = ''
                     hora = ''
             else:
-                print(f"No se encontró la fecha y hora en el texto de {nombre_archivo}.")
+                print(f"No se encontró la fecha y hora en el texto de {nombre_relativo}.")
                 fecha = ''
                 hora = ''
 
@@ -126,7 +128,7 @@ class ImageProcessor:
 
 class ImageBatchProcessor:
     """
-    Clase para procesar múltiples imágenes en una carpeta.
+    Clase para procesar múltiples imágenes en una carpeta y sus subcarpetas.
     """
     def __init__(self, ruta_carpeta, ruta_tesseract=r'C:\Program Files\Tesseract-OCR\tesseract.exe'):
         self.ruta_carpeta = ruta_carpeta
@@ -137,13 +139,13 @@ class ImageBatchProcessor:
     def procesar_imagenes(self):
         # Recorre cada patrón de extensión
         for extension in self.extensiones_imagen:
-            # Usa glob para obtener la lista de archivos con la extensión actual
-            ruta_patron = os.path.join(self.ruta_carpeta, extension)
-            archivos = glob.glob(ruta_patron)
+            # Usa glob para obtener la lista de archivos con la extensión actual de forma recursiva
+            ruta_patron = os.path.join(self.ruta_carpeta, '**', extension)
+            archivos = glob.glob(ruta_patron, recursive=True)
 
             for ruta_archivo in archivos:
                 print(f"Procesando {ruta_archivo}...")
-                datos = self.image_processor.procesar_imagen(ruta_archivo)
+                datos = self.image_processor.procesar_imagen(ruta_archivo, self.ruta_carpeta)
                 if datos:
                     self.datos_imagenes.append(datos)
 
@@ -159,13 +161,13 @@ class ImageBatchProcessor:
 
 # Ejemplo de uso:
 if __name__ == "__main__":
-    # Especifica la ruta de la carpeta que contiene las imágenes
-    ruta_carpeta_imagenes = r'C:\images'
+    # Especifica la ruta de la carpeta que contiene las imágenes y subcarpetas
+    ruta_carpeta_imagenes = r'C:\Users\jhonh\OneDrive - Instituto Colombiano de Bienestar Familiar\SFSC\2024\Repositorio_SFSC\Somos Familias, Somos Comunidad Guaviare'
 
     # Crea una instancia del procesador de lotes de imágenes
     batch_processor = ImageBatchProcessor(ruta_carpeta_imagenes)
 
-    # Procesa todas las imágenes en la carpeta
+    # Procesa todas las imágenes en la carpeta y sus subcarpetas
     batch_processor.procesar_imagenes()
 
     # Guarda los datos extraídos en un archivo Excel
