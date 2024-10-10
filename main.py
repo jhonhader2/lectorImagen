@@ -18,10 +18,8 @@ def main():
     batch_processor = ImageBatchProcessor(ruta_carpeta)
     batch_processor.procesar_imagenes()
 
-    print(f"{Fore.CYAN}Guardando datos en Excel...{Style.RESET_ALL}")
-    nombre_archivo_excel = input("Por favor, ingrese el nombre del archivo Excel (sin extensión): ")
-    nombre_archivo_excel = f"{nombre_archivo_excel}.xlsx"
-    batch_processor.guardar_datos_excel(nombre_archivo_excel)
+    # Llamamos a guardar_datos_excel sin parámetros
+    batch_processor.guardar_datos_excel()
 
     print(f"{Fore.GREEN}Proceso completado.{Style.RESET_ALL}")
 

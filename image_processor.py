@@ -65,22 +65,32 @@ class ImageBatchProcessor:
         self.mensajes_procesamiento.append(mensaje)
         return resultado
 
-    def guardar_datos_excel(self, nombre_archivo_excel='datos_extraidos.xlsx'):
-        # Guardamos todos los datos procesados, incluso si les falta fecha y hora
+    def guardar_datos_excel(self):
         datos_a_guardar = self.datos_imagenes
         
         if not datos_a_guardar:
             print(f"{Fore.RED}No se encontraron datos para guardar en el Excel.{Style.RESET_ALL}")
             return
 
-        df = pd.DataFrame([vars(img_data) for img_data in datos_a_guardar])
-        ruta_excel = os.path.join(self.ruta_carpeta, nombre_archivo_excel)
-        df.to_excel(ruta_excel, index=False)
-        print(f"{Fore.GREEN}Los datos han sido guardados en el archivo {ruta_excel}{Style.RESET_ALL}")
-        
         print(f"\n{Fore.CYAN}Resumen del proceso:{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}Total de archivos encontrados: {self.total_archivos}{Style.RESET_ALL}")
         print(f"{Fore.RED}Total de archivos no procesados: {len(self.archivos_con_error)}{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}Total de archivos sin fecha y hora: {len(self.archivos_sin_fecha_hora)}{Style.RESET_ALL}")
         print(f"{Fore.GREEN}Total de archivos procesados: {len(self.datos_imagenes)}{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}Se guardaron {len(datos_a_guardar)} registros en el archivo Excel.{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}Se pueden guardar {len(datos_a_guardar)} registros en el archivo Excel.{Style.RESET_ALL}")
+
+        # Preguntar al usuario si desea guardar el archivo
+        respuesta = input(f"\n{Fore.CYAN}¿Desea guardar los datos en un archivo Excel? (s/n): {Style.RESET_ALL}").lower()
+        
+        if respuesta == 's':
+            nombre_archivo = input(f"{Fore.CYAN}Por favor, ingrese el nombre del archivo Excel (sin extensión): {Style.RESET_ALL}")
+            nombre_archivo_excel = f"{nombre_archivo}.xlsx"
+            
+            df = pd.DataFrame([vars(img_data) for img_data in datos_a_guardar])
+            ruta_excel = os.path.join(self.ruta_carpeta, nombre_archivo_excel)
+            
+            print(f"{Fore.YELLOW}Guardando datos en Excel...{Style.RESET_ALL}")
+            df.to_excel(ruta_excel, index=False)
+            print(f"{Fore.GREEN}Los datos han sido guardados en el archivo {ruta_excel}{Style.RESET_ALL}")
+        else:
+            print(f"{Fore.YELLOW}Los datos no han sido guardados.{Style.RESET_ALL}")
