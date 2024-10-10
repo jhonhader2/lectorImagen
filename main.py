@@ -20,7 +20,7 @@ def main():
     batch_processor.procesar_imagenes()
 
     excel_exporter = ExcelExporter(ruta_carpeta)
-    excel_exporter.exportar_a_excel(batch_processor.datos_imagenes)
+    excel_exporter.solicitar_exportacion(batch_processor.datos_imagenes)
 
     print(f"{Fore.GREEN}Proceso completado.{Style.RESET_ALL}")
 
