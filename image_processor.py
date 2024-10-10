@@ -27,22 +27,7 @@ class ImageBatchProcessor:
         
         self.datos_imagenes = [r for r in resultados if r is not None]       
 
-        print("\n" + "="*50)
-        print("\nResumen del procesamiento:")
-        for mensaje in self.mensajes_procesamiento:
-            print(mensaje)
-        
-        if self.archivos_con_error:
-            print(f"\n{Fore.RED}Los siguientes archivos no se pudieron procesar:{Style.RESET_ALL}")
-            for archivo in self.archivos_con_error:
-                print(f"{Fore.RED}- {archivo}{Style.RESET_ALL}")
-        
-        if self.archivos_sin_fecha_hora:
-            print(f"\n{Fore.YELLOW}No se encontró la fecha y hora en el texto de los siguientes archivos:{Style.RESET_ALL}")
-            for archivo in self.archivos_sin_fecha_hora:
-                print(f"{Fore.YELLOW}- {archivo}{Style.RESET_ALL}")
-        
-        print("\n" + "="*50)
+        self._mostrar_resumen()
 
     def _obtener_archivos(self):
         return [
@@ -65,6 +50,30 @@ class ImageBatchProcessor:
         self.mensajes_procesamiento.append(mensaje)
         return resultado
 
+    def _mostrar_resumen(self):
+        print("\n" + "="*50)
+        print("\nResumen del procesamiento:")
+        for mensaje in self.mensajes_procesamiento:
+            print(mensaje)
+        
+        if self.archivos_con_error:
+            print(f"\n{Fore.RED}Los siguientes archivos no se pudieron procesar:{Style.RESET_ALL}")
+            for archivo in self.archivos_con_error:
+                print(f"{Fore.RED}- {archivo}{Style.RESET_ALL}")
+        
+        if self.archivos_sin_fecha_hora:
+            print(f"\n{Fore.YELLOW}No se encontró la fecha y hora en el texto de los siguientes archivos:{Style.RESET_ALL}")
+            for archivo in self.archivos_sin_fecha_hora:
+                print(f"{Fore.YELLOW}- {archivo}{Style.RESET_ALL}")
+        
+        print("\n" + "="*50)
+        print(f"\n{Fore.CYAN}Resumen del proceso:{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Total de archivos encontrados: {self.total_archivos}{Style.RESET_ALL}")
+        print(f"{Fore.RED}Total de archivos no procesados: {len(self.archivos_con_error)}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Total de archivos sin fecha y hora: {len(self.archivos_sin_fecha_hora)}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}Total de archivos procesados: {len(self.datos_imagenes)}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}Se pueden guardar {len(self.datos_imagenes)} registros en el archivo Excel.{Style.RESET_ALL}")
+
     def guardar_datos_excel(self):
         datos_a_guardar = self.datos_imagenes
         
@@ -77,7 +86,7 @@ class ImageBatchProcessor:
         print(f"{Fore.RED}Total de archivos no procesados: {len(self.archivos_con_error)}{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}Total de archivos sin fecha y hora: {len(self.archivos_sin_fecha_hora)}{Style.RESET_ALL}")
         print(f"{Fore.GREEN}Total de archivos procesados: {len(self.datos_imagenes)}{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}Se pueden guardar {len(datos_a_guardar)} registros en el archivo Excel.{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}Se pueden guardar {len(self.datos_imagenes)} registros en el archivo Excel.{Style.RESET_ALL}")
 
         # Preguntar al usuario si desea guardar el archivo
         respuesta = input(f"\n{Fore.CYAN}¿Desea guardar los datos en un archivo Excel? (s/n): {Style.RESET_ALL}").lower()

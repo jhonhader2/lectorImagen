@@ -1,6 +1,7 @@
 import os
 from colorama import init, Fore, Style
 from image_processor import ImageBatchProcessor
+from excel_exporter import ExcelExporter
 
 init(autoreset=True)
 
@@ -18,8 +19,8 @@ def main():
     batch_processor = ImageBatchProcessor(ruta_carpeta)
     batch_processor.procesar_imagenes()
 
-    # Llamamos a guardar_datos_excel sin parámetros
-    batch_processor.guardar_datos_excel()
+    excel_exporter = ExcelExporter(ruta_carpeta)
+    excel_exporter.exportar_a_excel(batch_processor.datos_imagenes)
 
     print(f"{Fore.GREEN}Proceso completado.{Style.RESET_ALL}")
 
